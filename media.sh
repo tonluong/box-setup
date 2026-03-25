@@ -93,3 +93,26 @@ yta() {
   mpv --no-config --no-video --script-opts=ytdl_hook-ytdl_path=yt-dlp --ytdl-format="$format" "ytdl://$video_id"
 }
 
+ytclip() {
+  if [ "$#" -lt 4 ]; then
+    echo "Usage: ytclip <video_id> <start_time> <duration> <output_file.mp4>"
+    echo "Example: ytclip dQw4w9WgXcQ 00:01:30 15 output.mp4"
+    return 1
+  fi
+
+  local video_id="$1"
+  local start="$2"
+  local duration="$3"
+  local output="$4"
+
+  echo "Clipping $duration seconds from $start..."
+
+  # yt-dlp handles the format fallbacks safely and passes the exact
+  # start time and duration directly to ffmpeg's input stream.
+  yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" \
+         --external-downloader ffmpeg \
+         --external-downloader-args "ffmpeg_i:-ss $start -t $duration" \
+         -o "$output" \
+         "https://www.youtube.com/watch?v=$video_id"
+}
+
