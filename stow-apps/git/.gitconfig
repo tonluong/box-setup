@@ -1,0 +1,38 @@
+# Core Aliases
+[alias]
+
+# Default to Personal Identity for everything in the Personal folder
+[includeIf "gitdir:~/projects/"]
+    path = ~/.gitconfig-me
+
+# Automatically swap to Work Identity for anything in the CHM folder
+[includeIf "gitdir:~/projects-chm/"]
+    path = ~/.gitconfig-chm
+
+# Git Large File Storage Engine
+[filter "lfs"]
+    process = git-lfs filter-process
+    required = true
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+
+# Natively mapped
+[alias]
+	a = add
+	ap = add -p
+	p = push
+	se = !git rev-list --all | xargs git grep -F
+	s = status -s -uno
+	ss = status -s
+	cm = commit -m
+	co = checkout
+	cob = checkout -b
+	m = merge --no-ff
+
+    # Complex visual aliases
+	b = !git for-each-ref --sort='-authordate' --format='%(authordate)%09%(objectname:short)%09%(refname)' refs/heads | sed -e 's-refs/heads/--'
+	lg = log --graph --abbrev-commit --decorate --date=relative --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all
+	lgg = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(bold yellow)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)' --all
+
+	r = remote -v
+	gl = config --global -l
