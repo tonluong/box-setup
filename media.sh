@@ -11,32 +11,47 @@ yts() {
 
 yt() {
   local video_id
+  local quality=""
+
+  if [[ "$1" == "360" || "$1" == "720" || "$1" == "term" ]]; then
+    quality="$1"
+    shift
+  fi
 
   # Check if standard input is NOT a terminal (meaning data is being piped in)
   if [ ! -t 0 ]; then
     # Read the first line from the pipe
     read -r line
-    
+
     # Extract the video ID (grabs the first word before the space)
     video_id=$(echo "$line" | awk '{print $1}')
-    
-    # Silently consume the rest of the search results so yt-dlp 
+
+    # Silently consume the rest of the search results so yt-dlp
     # doesn't throw a "broken pipe" error when we stop reading
     cat > /dev/null
   else
-    # If no pipe, use the manually provided argument
     video_id="$1"
   fi
 
-  # Failsafe if nothing was passed
   if [ -z "$video_id" ]; then
-    echo "Usage: yt <video_id>"
-    echo "       yts <search terms> | yt"
+    echo "Usage: yt [360|720|term] <video_id>"
+    echo "       yts <search terms> | yt [360|720|term]"
     return 1
   fi
 
-  echo "Terminal playback starting for: $video_id"
-  mpv --vo=tct "ytdl://$video_id"
+  if [[ "$quality" == "360" ]]; then
+    echo "Playing 360p: $video_id"
+    mpv --autofit-smaller=640x480 --ytdl-format="bestvideo[height=?360][fps<=?30][vcodec!=?vp9]+bestaudio/best" "ytdl://$video_id"
+  elif [[ "$quality" == "720" ]]; then
+    echo "Playing 720p: $video_id"
+    mpv --autofit-smaller=640x480 --ytdl-format="bestvideo[height=?720][fps<=?30][vcodec!=?vp9]+bestaudio/best" "ytdl://$video_id"
+  elif [[ "$quality" == "term" ]]; then
+    echo "Terminal playback: $video_id"
+    mpv --vo=tct "ytdl://$video_id"
+  else
+    echo "Playing: $video_id"
+    mpv "ytdl://$video_id"
+  fi
 }
 
 yta() {
