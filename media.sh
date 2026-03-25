@@ -116,3 +116,48 @@ ytclip() {
          "https://www.youtube.com/watch?v=$video_id"
 }
 
+mp3-nogap() {
+  if [ -z "$1" ] || [ ! -f "$1" ]; then
+    echo "Usage: mp3-nogap <audio_or_video_file>"
+    return 1
+  fi
+
+  local file_path="$1"
+  local base="${file_path##*/}"
+  local name="${base%.*}"
+
+  echo "Trimming silence from: $base..."
+
+  ffmpeg -i "$file_path" \
+    -lavfi "silenceremove=window=0.02:detection=peak:stop_mode=all:start_mode=all:stop_periods=-1:stop_threshold=-26dB:stop_duration=3:start_threshold=-26dB" \
+    -c:a libmp3lame -q:a 2 \
+    "${name}-nogap.mp3"
+
+  echo "Done: ${name}-nogap.mp3"
+}
+
+mp3-speed() {
+  if [ -z "$1" ] || [ ! -f "$1" ]; then
+    echo "Usage: mp3-speed <audio_file>"
+    return 1
+  fi
+
+  local file_path="$1"
+  local base="${file_path##*/}"
+  local name="${base%.*}"
+  local speeds="1.1 1.25 1.5 1.75"
+
+  echo "Batch processing speeds for: $base..."
+
+  for speed in $speeds; do
+    echo " -> Generating ${speed}x version..."
+    ffmpeg -nostdin -i "$file_path" \
+      -af "atempo=${speed}" \
+      -c:a libmp3lame -q:a 2 \
+      -loglevel error \
+      "${name}-${speed}x.mp3"
+  done
+
+  echo "Done! All speed variants generated."
+}
+
