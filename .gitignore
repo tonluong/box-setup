@@ -1,0 +1,37 @@
+# ==========================================
+# OS Generated Files
+# ==========================================
+# Prevents macOS metadata from polluting your Linux servers
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# ==========================================
+# Editor & Temporary Files
+# ==========================================
+# Vim/Neovim swap files
+*.swp
+*.swo
+*~
+# VS Code (just in case)
+.vscode/
+
+# ==========================================
+# Security & Secrets (The Safety Net)
+# ==========================================
+# Ignore the local-only SSH configuration we discussed
+config.local
+stow-apps/ssh/.ssh/config.local
+
+# Absolute failsafe: Never allow actual SSH keys to be committed
+# even if you accidentally drop them into this folder
+id_rsa*
+*.pem
+*.ed25519
+*tonluong_2025*
+
+# Ignore any local overrides or API templates you might add later
+*.local
+*secret*.json
